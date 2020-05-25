@@ -620,8 +620,21 @@ static int decoder_decode_frame(FFPlayer *ffp, Decoder *d, AVFrame *frame, AVSub
                 av_packet_move_ref(&pkt, &d->pkt);
                 d->packet_pending = 0;
             } else {
-                if (packet_queue_get_or_buffering(ffp, d->queue, &pkt, &d->pkt_serial, &d->finished) < 0)
+                if (packet_queue_get_or_buffering(ffp, d->queue, &pkt, &d->pkt_serial, &d->finished) < 0) {
                     return -1;
+                }
+                // 获取开始录制前dts和pts最后的值
+                //if (!ffp->is_first && pkt.pts == pkt.dts) {// 加上pkt.pts == pkt.dts会花屏
+                 if (!ffp->is_first) {
+                    ffp->start_pts = pkt.pts;
+                    ffp->start_dts = pkt.dts;
+                 }
+                 if (ffp->is_record) { // 可以录制时，写入文件
+                    if (0 != ffp_record_file(ffp, &pkt)) {
+                        ffp->record_error = 1;
+                        ffp_stop_record(ffp);
+                    }
+                 }
             }
         } while (d->queue->serial != d->pkt_serial);
 
@@ -3620,18 +3633,6 @@ static int read_thread(void *arg)
                 }
             }
         }
-
-         // 获取开始录制前dts等于pts最后的值，用于
-         if (!ffp->is_first && pkt->pts == pkt->dts) {
-                     ffp->start_pts = pkt->pts;
-                     ffp->start_dts = pkt->dts;
-                 }
-         if (ffp->is_record) { // 可以录制时，写入文件
-             if (0 != ffp_record_file(ffp, pkt)) {
-                 ffp->record_error = 1;
-                 ffp_stop_record(ffp);
-             }
-         }
     }
 
     ret = 0;
