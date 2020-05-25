@@ -5161,6 +5161,7 @@ int ffp_start_record(FFPlayer *ffp, const char *file_name)
             ffp->is_record = 1;
             ffp->record_error = 0;
             pthread_mutex_init(&ffp->record_mutex, NULL);
+            ffp_notify_msg1(ffp, FFP_MSG_VIDEO_RECORD_START);
 
             return 0;
         end:
@@ -5183,7 +5184,6 @@ int ffp_record_file(FFPlayer *ffp, AVPacket *packet)
                 }
 
                 AVPacket *pkt = (AVPacket *)av_malloc(sizeof(AVPacket)); // 与看直播的 AVPacket分开，不然卡屏
-                av_log(ffp, AV_LOG_INFO, "----------- pts:%llx,dts:%llx,duration:%llx",pkt->pts,pkt->dts,pkt->duration);
                 av_new_packet(pkt, 0);
                 if (0 == av_packet_ref(pkt, packet)) {
                     pthread_mutex_lock(&ffp->record_mutex);
@@ -5237,9 +5237,10 @@ int ffp_stop_record(FFPlayer *ffp)
                 }
                 pthread_mutex_unlock(&ffp->record_mutex);
                 pthread_mutex_destroy(&ffp->record_mutex);
+                ffp_notify_msg1(ffp, FFP_MSG_VIDEO_RECORD_STOP);
                 av_log(ffp, AV_LOG_DEBUG, "stopRecord ok\n");
             } else {
-                av_log(ffp, AV_LOG_ERROR, "don't need stopRecord\n");
+                av_log(ffp, AV_LOG_DEBUG, "don't need stopRecord\n");
             }
             return 0;
         }

@@ -1075,6 +1075,14 @@ static void message_loop_n(JNIEnv *env, IjkMediaPlayer *mp)
             MPTRACE("FFP_MSG_AUDIO_SEEK_RENDERING_START:\n");
             post_event(env, weak_thiz, MEDIA_INFO, MEDIA_INFO_AUDIO_SEEK_RENDERING_START, msg.arg1);
             break;
+        case FFP_MSG_VIDEO_RECORD_START:
+            MPTRACE("FFP_MSG_VIDEO_RECORD_START:\n");
+            post_event(env, weak_thiz, MEDIA_INFO, FFP_MSG_VIDEO_RECORD_START, 0);
+            break;
+        case FFP_MSG_VIDEO_RECORD_STOP:
+            MPTRACE("FFP_MSG_VIDEO_RECORD_STOP:\n");
+            post_event(env, weak_thiz, MEDIA_INFO, FFP_MSG_VIDEO_RECORD_STOP, 0);
+            break;
         default:
             ALOGE("unknown FFP_MSG_xxx(%d)\n", msg.what);
             break;

@@ -38,6 +38,10 @@ public interface IMediaPlayer {
     int MEDIA_INFO_UNKNOWN = 1;
     int MEDIA_INFO_STARTED_AS_NEXT = 2;
     int MEDIA_INFO_VIDEO_RENDERING_START = 3;
+    /** 开始录制 */
+    int FFP_MSG_VIDEO_RECORD_START = 412;
+    /** 停止录制*/
+    int FFP_MSG_VIDEO_RECORD_STOP = 413;
     int MEDIA_INFO_VIDEO_TRACK_LAGGING = 700;
     int MEDIA_INFO_BUFFERING_START = 701;
     int MEDIA_INFO_BUFFERING_END = 702;
